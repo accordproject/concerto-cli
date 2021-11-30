@@ -45,6 +45,7 @@
     "tmp-promise": "3.0.2"
   },
   "dependencies": {
+    "@accordproject/concerto-util": "1.2.1",
     "@accordproject/concerto-core": "1.2.1",
     "@accordproject/concerto-cto": "1.2.1",
     "@accordproject/concerto-tools": "1.2.1",
