@@ -48,6 +48,7 @@
     "@accordproject/concerto-util": "1.2.1",
     "@accordproject/concerto-core": "1.2.1",
     "@accordproject/concerto-cto": "1.2.1",
+    "@accordproject/concerto-metamodel": "1.2.1",
     "@accordproject/concerto-tools": "1.2.1",
     "mkdirp": "1.0.4",
     "yargs": "17.1.0"
