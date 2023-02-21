@@ -94,6 +94,5 @@ jobs:
       - name: build and publish
         run: |
           npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
-          npm version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
-          npx lerna version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
-          npx lerna exec -- npm publish --access public --tag=unstable 2>&1
+          npm version patch --force --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
+          npm publish --access public --tag=unstable 2>&1
