@@ -31,7 +31,7 @@ jobs:
       - name: build and publish
         run: |
           npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
-          npm version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
+          npm version --no-git-tag-version --yes --exact ${{ steps.tag.outputs.tag }}
           npm publish --access public --tag=unstable 2>&1
 
       - name: Create PR to increment version
