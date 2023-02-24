@@ -18,6 +18,7 @@
     "directory": "packages/concerto-cli"
   },
   "scripts": {
+    "coverage": "node ./scripts/coverage.js \"packages/concerto-*\" && nyc report -t coverage --cwd . --report-dir coverage --reporter=lcov && cat ./coverage/lcov.info",
     "lint": "eslint .",
     "pretest": "npm run lint",
     "postlint": "npm run licchk",
