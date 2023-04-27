@@ -148,6 +148,12 @@ describe('concerto-cli', () => {
             fs.readdirSync(dir.path).length.should.be.above(0);
             dir.cleanup();
         });
+        it('should compile to a Rust model', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            await Commands.compile('Rust', models, dir.path, {offline:false});
+            fs.readdirSync(dir.path).length.should.be.above(0);
+            dir.cleanup();
+        });
         it('should compile to a Java model', async () => {
             const dir = await tmp.dir({ unsafeCleanup: true});
             await Commands.compile('Java', models, dir.path);
