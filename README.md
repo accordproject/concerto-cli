@@ -74,6 +74,12 @@ concerto compile --model modelfile.cto --target PlantUML
 concerto compile --model modelfile.cto --target Typescript
 ```
 
+#### Rust
+
+```
+concerto compile --model modelfile.cto --target Rust
+```
+
 #### Java
 
 ```
