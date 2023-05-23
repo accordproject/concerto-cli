@@ -2,6 +2,9 @@ namespace person@1.0.0
 
 concept Person identified by ssn {
  o String name
+ o String firstName length=[,10]
+ o String lastName length=[1,10]
+ o String fatherName length=[1,]
  @description("Height (cm)")
  o Double height range=[0.0,]
  o DateTime dateOfBirth

@@ -15,6 +15,7 @@
 'use strict';
 
 const chai = require('chai');
+const expect = chai.expect;
 const path = require('path');
 const tmp = require('tmp-promise');
 const fs = require('fs');
@@ -666,6 +667,19 @@ describe('concerto-cli', () => {
                 { offline: true, optionalFields: true }
             );
             (typeof obj.ssn).should.equal('string');
+        });
+
+        it('should generate an string values within the given length range', async () => {
+            const obj = await Commands.generate(
+                offlineModels,
+                'person@1.0.0.Person',
+                'sample',
+                { offline: true, optionalFields: true }
+            );
+            expect(obj.lastName.length >= 1).to.be.true;
+            expect(obj.lastName.length <= 10).to.be.true;
+            expect(obj.firstName.length <= 10).to.be.true;
+            expect(obj.fatherName.length >= 1).to.be.true;
         });
     });
 });
