@@ -35,7 +35,7 @@
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "eslint": "8.2.0",
-    "jsdoc": "^3.6.7",
+    "jsdoc": "^4.0.2",
     "license-check-and-add": "2.3.6",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@accordproject/concerto-analysis": "3.8.1",
-    "@accordproject/concerto-codegen": "3.10.0",
+    "@accordproject/concerto-codegen": "3.11.0",
     "@accordproject/concerto-core": "3.8.1",
     "@accordproject/concerto-cto": "3.8.1",
     "@accordproject/concerto-metamodel": "3.8.0",
