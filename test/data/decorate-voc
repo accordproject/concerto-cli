@@ -1,0 +1,6 @@
+locale: en-gb
+namespace: test@1.0.0
+declarations:
+  - Driver: A driver of a vehicle
+    properties:
+      - favoriteColor: favourite colour
