@@ -722,7 +722,7 @@ describe('concerto-cli', () => {
             };
             const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-vocabs-and-deco.json'),'utf-8');
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            result.should.equal(expected);
+            result.trim().should.equal(expected.trim());
             dir.cleanup();
         });
         it('should throw error if data is invalid', async () => {
@@ -741,6 +741,20 @@ describe('concerto-cli', () => {
                 (typeof err).should.equal('object');
             }
             dir.cleanup();
+        });
+        it('should write to a file if output is provided', async () => {
+            const output = await tmp.file({ unsafeCleanup: true });
+            const model = path.resolve(__dirname, 'models', 'decorate-model.cto');
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators =undefined;
+            const options={
+                format:'json',
+                output:output.path
+            };
+            const expected = await Commands.decorate(model,decorators,vocabs,options);
+            const result = fs.readFileSync(output.path, 'utf-8');
+            result.trim().should.equal(expected.trim());
+            output.cleanup();
         });
     });
 });
