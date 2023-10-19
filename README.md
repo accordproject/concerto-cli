@@ -126,9 +126,10 @@ apply the decorators and vocabs to the target models from given list of dcs file
 
 Options:
   --model      The CTO file                                   
-  --voc        The List of vocab files                                             
-  --dcs        The List of decorator command set files                                            
-  --f          output format (cto or json), default: cto
+  --vocabulary The List of vocab files                                             
+  --decorator  The List of decorator command set files                                            
+  --format     output format (cto or json), default: cto
+  --output       output directory path 
 ```
 
 ## License <a name="license"></a>

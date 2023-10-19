@@ -414,34 +414,39 @@ require('yargs')
             describe: 'The file location of the source model',
             type: 'string',
         });
-        yargs.option('dcs', {
+        yargs.option('decorator', {
             describe: 'List of dcs files to be applied to model',
             type: 'string',
             array:true
         });
-        yargs.option('voc', {
+        yargs.option('vocabulary', {
             describe: 'List of vocab files to be applied to model',
             type: 'string',
             array:true
         });
-        yargs.option('f', {
+        yargs.option('format', {
             describe: 'Output format (json or cto)',
             type: 'string',
             default:'cto',
             choices: ['json', 'cto']
         });
+        yargs.option('output', {
+            describe: 'output directory path',
+            type: 'string',
+        });
         yargs.check((args) => {
             // Custom validation to ensure at least one of the two options is provided
-            if (!args.dcs && !args.voc) {
+            if (!args.decorator && !args.vocabulary) {
                 throw new Error('You must provide at least one of dcs files or voc files');
             }
             return true;
         });
     }, argv => {
         let options={};
-        options.format=argv.f;
+        options.format=argv.format;
+        options.output=argv.output;
 
-        return Commands.decorate(argv.model, argv.dcs,argv.voc,options)
+        return Commands.decorate(argv.model, argv.decorator,argv.vocabulary,options)
             .then(obj => {
                 console.log(obj);
             })
