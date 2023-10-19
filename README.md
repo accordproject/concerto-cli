@@ -115,6 +115,22 @@ Options:
   --output       output directory path                  [string] [default: "./"]
 ```
 
+### Concerto Decorate
+
+The `decorate` command allows you to add decorators and vocabularies to your local CTO file from a set of local DCS and Vocab Command Set files
+
+```
+concerto decorate
+
+apply the decorators and vocabs to the target models from given list of dcs files and vocab files
+
+Options:
+  --model      The CTO file                                   
+  --voc        The List of vocab files                                             
+  --dcs        The List of decorator command set files                                            
+  --f          output format (cto or json), default: cto
+```
+
 ## License <a name="license"></a>
 Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.
 

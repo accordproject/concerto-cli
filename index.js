@@ -408,6 +408,47 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('decorate', 'apply the decorators and vocabs to the target models from given list of dcs files and vocab files', yargs => {
+        yargs.demandOption('model', 'Please provide a model');
+        yargs.option('model', {
+            describe: 'The file location of the source model',
+            type: 'string',
+        });
+        yargs.option('dcs', {
+            describe: 'List of dcs files to be applied to model',
+            type: 'string',
+            array:true
+        });
+        yargs.option('voc', {
+            describe: 'List of vocab files to be applied to model',
+            type: 'string',
+            array:true
+        });
+        yargs.option('f', {
+            describe: 'Output format (json or cto)',
+            type: 'string',
+            default:'cto',
+            choices: ['json', 'cto']
+        });
+        yargs.check((args) => {
+            // Custom validation to ensure at least one of the two options is provided
+            if (!args.dcs && !args.voc) {
+                throw new Error('You must provide at least one of dcs files or voc files');
+            }
+            return true;
+        });
+    }, argv => {
+        let options={};
+        options.format=argv.f;
+
+        return Commands.decorate(argv.model, argv.dcs,argv.voc,options)
+            .then(obj => {
+                console.log(obj);
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false
