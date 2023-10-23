@@ -409,10 +409,11 @@ require('yargs')
             });
     })
     .command('decorate', 'apply the decorators and vocabs to the target models from given list of dcs files and vocab files', yargs => {
-        yargs.demandOption('model', 'Please provide a model');
-        yargs.option('model', {
-            describe: 'The file location of the source model',
+        yargs.demandOption('models', 'Please provide a model');
+        yargs.option('models', {
+            describe: 'The file location of the source models',
             type: 'string',
+            array:true,
         });
         yargs.option('decorator', {
             describe: 'List of dcs files to be applied to model',
@@ -446,7 +447,7 @@ require('yargs')
         options.format=argv.format;
         options.output=argv.output;
 
-        return Commands.decorate(argv.model, argv.decorator,argv.vocabulary,options)
+        return Commands.decorate(argv.models, argv.decorator,argv.vocabulary,options)
             .then(obj => {
                 console.log(obj);
             })
