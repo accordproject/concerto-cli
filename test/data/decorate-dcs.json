@@ -22,6 +22,20 @@
         "type": "UPSERT",
         "target": {
           "$class": "org.accordproject.decoratorcommands.CommandTarget",
+          "property": "bar"
+        },
+        "decorator": {
+          "$class": "concerto.metamodel@1.0.0.Decorator",
+          "name": "PII",
+          "arguments": [
+          ]
+        }
+      },
+      {
+        "$class": "org.accordproject.decoratorcommands.Command",
+        "type": "UPSERT",
+        "target": {
+          "$class": "org.accordproject.decoratorcommands.CommandTarget",
           "type": "concerto.metamodel@1.0.0.ObjectProperty"
         },
         "decorator": {

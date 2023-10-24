@@ -772,5 +772,18 @@ describe('concerto-cli', () => {
             expect(anyFileExists).to.be.true;
             output.cleanup();
         });
+        it('should apply decorators when the model files are having dependency', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'version-c.cto'),path.resolve(__dirname, 'models', 'version-b.cto')];
+            const vocabs = undefined;
+            const decorators =[path.resolve(__dirname, 'data', 'decorate-dcs.json')];
+            const options={
+                format:'cto',
+            };
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-dependency.cto'),'utf-8');
+            const result =await Commands.decorate(model,decorators,vocabs,options);
+            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            dir.cleanup();
+        });
     });
 });
