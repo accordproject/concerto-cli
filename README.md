@@ -1,118 +1,53 @@
 # Concerto CLI
 
-Command line tool for Concerto.
+[![join discord](https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue)](https://discord.gg/Zm99SKhhtA/)
 
-## Usage
+This repository contains the CLI interface to test, edit, compile and update Concerto Models.
 
-```
-concerto <cmd> [args]
+### Documentation
 
-Commands:
-  concerto validate  validate JSON against model files
-  concerto compile   generate code for a target platform
-  concerto get       save local copies of external model dependencies
+The command set exposed by this repository is described at [cli-docs](https://concerto.accordproject.org/docs/tools/ref-concerto-cli).
 
-Options:
-  --version      Show version number                                   [boolean]
-  --verbose, -v                                                 [default: false]
-  --help         Show help                                             [boolean]
-```
 
-### Concerto validate
+<p align="center">
+  <a href="https://www.accordproject.org/">
+    <img src="assets/APLogo.png" alt="Accord Project Logo" width="400" />
+  </a>
+</p>
 
-The `validate` command lets you check whether a JSON input is a valid instance of the given model.
+<p align="center">
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/github/license/accordproject/cicero?color=bright-green" alt="GitHub license">
+  </a>
+  <a href="https://accord-project-slack-signup.herokuapp.com/">
+    <img src="https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue" alt="Join the Accord Project Slack"/>
+  </a>
+</p>
 
-```
-concerto validate
+Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound]. The technical charter for the Accord Project can be found [here][charter].
 
-validate JSON against model files
+## Learn More About Accord Project
 
-Options:
-  --version      Show version number                                   [boolean]
-  --verbose, -v                                                 [default: false]
-  --help         Show help                                             [boolean]
-  --input        JSON to validate                                       [string]
-  --model        array of concerto (cto) model files                     [array]
-  --offline      do not resolve external models       [boolean] [default: false]
-  --functional   new validation API                   [boolean] [default: false]
-```
+### [Overview][apmain]
 
-### Concerto compile
+### [Documentation][apdoc]
 
-The `compile` command takes an array of local CTO files, download any external dependencies (imports) and then convert all the model in the `ModelManager` to the target format.
+## Contributing
 
-```
-concerto compile
+The Accord Project technology is being developed as open source. All the software packages are being actively maintained on GitHub and we encourage organizations and individuals to contribute requirements, documentation, issues, new templates, and code.
 
-generate code for a target platform
+Find out what’s coming on our [blog][apblog].
 
-Options:
-  --version      Show version number                                   [boolean]
-  --verbose, -v                                                 [default: false]
-  --help         Show help                                             [boolean]
-  --model        array of concerto (cto) model files          [array] [required]
-  --offline      do not resolve external models       [boolean] [default: false]
-  --target       target of the code generation  [string] [default: "JSONSchema"]
-  --output       output directory path           [string] [default: "./output/"]
-```
+Join the Accord Project Technology Working Group [Discord channel][apdisc] to get involved!
 
-#### Go Lang
+For code contributions, read our [CONTRIBUTING guide][contributing] and information for [DEVELOPERS][developers].
+
+### README Badge
+
+Using Accord Project? Add a README badge to let everyone know: [![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
 
 ```
-concerto compile --model modelfile.cto --target Go
-```
-
-#### Plant UML
-
-```
-concerto compile --model modelfile.cto --target PlantUML
-```
-
-#### Typescript
-
-```
-concerto compile --model modelfile.cto --target Typescript
-```
-
-#### Rust
-
-```
-concerto compile --model modelfile.cto --target Rust
-```
-
-#### Java
-
-```
-concerto compile --model modelfile.cto --target Java
-```
-
-#### JSONSchema
-
-```
-concerto compile --model modelfile.cto --target JSONSchema
-```
-
-#### XMLSchema
-
-```
-concerto compile --model modelfile.cto --target XMLSchema
-```
-
-### Concerto Get
-
-The `get` command allows you to resolve and download external models from a set of local CTO files.
-
-```
-concerto get
-
-save local copies of external model dependencies
-
-Options:
-  --version      Show version number                                   [boolean]
-  --verbose, -v                                                 [default: false]
-  --help         Show help                                             [boolean]
-  --model        array of concerto (cto) model files          [array] [required]
-  --output       output directory path                  [string] [default: "./"]
+[![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
 ```
 
 ### Concerto Decorate
@@ -133,5 +68,24 @@ Options:
 ```
 
 ## License <a name="license"></a>
-Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.
 
+Accord Project source code files are made available under the [Apache License, Version 2.0][apache].
+Accord Project documentation files are made available under the [Creative Commons Attribution 4.0 International License][creativecommons] (CC-BY-4.0).
+
+Copyright 2018-2019 Clause, Inc. All trademarks are the property of their respective owners. See [LF Projects Trademark Policy](https://lfprojects.org/policies/trademark-policy/).
+
+[linuxfound]: https://www.linuxfoundation.org
+[charter]: https://github.com/accordproject/governance/blob/master/accord-project-technical-charter.md
+[apmain]: https://accordproject.org/ 
+[apblog]: https://medium.com/@accordhq
+[apdoc]: https://docs.accordproject.org/
+[apslack]: https://accord-project-slack-signup.herokuapp.com
+[apdisc]: https://discord.gg/Zm99SKhhtA
+
+[storybook]: https://ap-web-components.netlify.app/
+
+[contributing]: https://github.com/accordproject/web-components/blob/master/CONTRIBUTING.md
+[developers]: https://github.com/accordproject/web-components/blob/master/DEVELOPERS.md
+
+[apache]: https://github.com/accordproject/web-components/blob/master/LICENSE
+[creativecommons]: http://creativecommons.org/licenses/by/4.0/
