@@ -412,6 +412,7 @@ require('yargs')
         yargs.demandOption('models', 'Please provide a model');
         yargs.option('models', {
             describe: 'The file location of the source models',
+            alias: 'model',
             type: 'string',
             array:true,
         });

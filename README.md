@@ -50,23 +50,6 @@ Using Accord Project? Add a README badge to let everyone know: [![accord project
 [![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
 ```
 
-### Concerto Decorate
-
-The `decorate` command allows you to add decorators and vocabularies to your local CTO file from a set of local DCS and Vocab Command Set files
-
-```
-concerto decorate
-
-apply the decorators and vocabs to the target models from given list of dcs files and vocab files
-
-Options:
-  --model      The CTO file                                   
-  --vocabulary The List of vocab files                                             
-  --decorator  The List of decorator command set files                                            
-  --format     output format (cto or json), default: cto
-  --output       output directory path 
-```
-
 ## License <a name="license"></a>
 
 Accord Project source code files are made available under the [Apache License, Version 2.0][apache].
