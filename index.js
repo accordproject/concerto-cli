@@ -408,6 +408,54 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('decorate', 'apply the decorators and vocabs to the target models from given list of dcs files and vocab files', yargs => {
+        yargs.demandOption('models', 'Please provide a model');
+        yargs.option('models', {
+            describe: 'The file location of the source models',
+            alias: 'model',
+            type: 'string',
+            array:true,
+        });
+        yargs.option('decorator', {
+            describe: 'List of dcs files to be applied to model',
+            type: 'string',
+            array:true
+        });
+        yargs.option('vocabulary', {
+            describe: 'List of vocab files to be applied to model',
+            type: 'string',
+            array:true
+        });
+        yargs.option('format', {
+            describe: 'Output format (json or cto)',
+            type: 'string',
+            default:'cto',
+            choices: ['json', 'cto']
+        });
+        yargs.option('output', {
+            describe: 'output directory path',
+            type: 'string',
+        });
+        yargs.check((args) => {
+            // Custom validation to ensure at least one of the two options is provided
+            if (!args.decorator && !args.vocabulary) {
+                throw new Error('You must provide at least one of dcs files or voc files');
+            }
+            return true;
+        });
+    }, argv => {
+        let options={};
+        options.format=argv.format;
+        options.output=argv.output;
+
+        return Commands.decorate(argv.models, argv.decorator,argv.vocabulary,options)
+            .then(obj => {
+                console.log(obj);
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false

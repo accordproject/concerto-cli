@@ -1,0 +1,6 @@
+namespace org.accordproject.concerto.test.c@3.4.5
+
+concept Boo {
+  @PII()
+  o String bar
+}

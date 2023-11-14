@@ -1,0 +1,23 @@
+namespace test@1.0.0
+
+abstract concept Person identified by ssn {
+  o String firstName
+  o String lastName
+  @PII()
+  o String ssn
+}
+
+concept Driver extends Person {
+  o String favoriteColor
+}
+
+concept Employee {
+  @PII()
+  o String ssn
+}
+
+concept Car identified by vin {
+  o String vin
+  @Hide("object")
+  o Person owner
+}

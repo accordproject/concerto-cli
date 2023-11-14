@@ -682,4 +682,108 @@ describe('concerto-cli', () => {
             expect(obj.fatherName.length >= 1).to.be.true;
         });
     });
+
+    describe('#decorate', () => {
+        it('should apply the list of decorators to model and output in cto by default', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [(path.resolve(__dirname, 'models', 'decorate-model.cto'))];
+            const decorators = [path.resolve(__dirname, 'data', 'decorate-dcs.json')];
+            const vocabs = undefined;
+            const options={
+                format:'cto'
+            };
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-dcs.cto'),'utf-8');
+            const result =await Commands.decorate(model,decorators,vocabs,options);
+            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            dir.cleanup();
+        });
+
+        it('should apply the list of vocabs to the model and output in cto by default', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-model.cto')];
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators = undefined;
+            const options={
+                format:'cto'
+            };
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-vocabs-only.cto'),'utf-8');
+            const result =await Commands.decorate(model,decorators,vocabs,options);
+            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            dir.cleanup();
+        });
+
+        it('should apply the list of vocabs and list of decorators to the model and output in asked format', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-model.cto')];
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators = [path.resolve(__dirname, 'data', 'decorate-dcs.json')];
+            const options={
+                format:'json'
+            };
+            const result =await Commands.decorate(model,decorators,vocabs,options);
+            let jsonObj=JSON.parse(result);
+            (typeof jsonObj).should.equal('object');
+            dir.cleanup();
+        });
+        it('should throw error if data is invalid', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-invalid-model.cto')];
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators =undefined;
+            const options={
+                format:'json'
+            };
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-vocabs-and-deco.json'),'utf-8');
+            try {
+                const result =await Commands.decorate(model,decorators,vocabs,options);
+                result.should.eql(expected);
+            } catch (err) {
+                (typeof err).should.equal('object');
+            }
+            dir.cleanup();
+        });
+        it('should write to a file if output is provided', async () => {
+            const output = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-model.cto')];
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators =undefined;
+            const options={
+                format:'json',
+                output:output.path
+            };
+            await Commands.decorate(model,decorators,vocabs,options);
+            const files = fs.readdirSync(output.path);
+            const anyFileExists = files.length > 0;
+            expect(anyFileExists).to.be.true;
+            output.cleanup();
+        });
+        it('should write to a file if output is provided and create the directory if it does not exist', async () => {
+            const output = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-model.cto')];
+            const vocabs = [path.resolve(__dirname, 'data', 'decorate-voc')];
+            const decorators =undefined;
+            const options={
+                format:'json',
+                output:output.path+'_output'
+            };
+            await Commands.decorate(model,decorators,vocabs,options);
+            const files = fs.readdirSync(output.path+'_output');
+            const anyFileExists = files.length > 0;
+            expect(anyFileExists).to.be.true;
+            output.cleanup();
+        });
+        it('should apply decorators when the model files are having dependency', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'version-c.cto'),path.resolve(__dirname, 'models', 'version-b.cto')];
+            const vocabs = undefined;
+            const decorators =[path.resolve(__dirname, 'data', 'decorate-dcs.json')];
+            const options={
+                format:'cto',
+            };
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-dependency.cto'),'utf-8');
+            const result =await Commands.decorate(model,decorators,vocabs,options);
+            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            dir.cleanup();
+        });
+    });
 });

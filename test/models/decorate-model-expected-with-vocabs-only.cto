@@ -1,0 +1,31 @@
+namespace test@1.0.0
+
+@Term("Person")
+abstract concept Person identified by ssn {
+  @Term("First Name of the Person")
+  o String firstName
+  @Term("Last Name of the Person")
+  o String lastName
+  @Term("Ssn of the Person")
+  o String ssn
+}
+
+@Term("A driver of a vehicle")
+concept Driver extends Person {
+  @Term("favourite colour")
+  o String favoriteColor
+}
+
+@Term("Employee")
+concept Employee {
+  @Term("Ssn of the Employee")
+  o String ssn
+}
+
+@Term("Car")
+concept Car identified by vin {
+  @Term("Vin of the Car")
+  o String vin
+  @Term("Owner of the Car")
+  o Person owner
+}
