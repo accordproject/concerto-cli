@@ -456,6 +456,43 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('extract-decorators','extracts the decorator command sets and vocabularies from a list of model files', yargs =>{
+        yargs.demandOption('models','Please provide a model');
+        yargs.option('models', {
+            describe: 'The file location of the source models',
+            alias: 'model',
+            type: 'string',
+            array:true,
+        });
+        yargs.option('locale', {
+            describe: 'The locale for extracted vocabularies',
+            type: 'string',
+            default:'en'
+        });
+        yargs.option('removeDecoratorsFromSource', {
+            describe: 'Flag to determine whether to remove decorators from source model',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('output', {
+            describe: 'output directory path',
+            type: 'string',
+            default: 'output'
+        });
+    }, argv => {
+        const options = {
+            locale: argv.locale,
+            removeDecoratorsFromModel: argv.removeDecoratorsFromSource,
+            output: argv.output
+        };
+        return Commands.extractDecorators(argv.models,options)
+            .then(result => {
+                Logger.info(result);
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false

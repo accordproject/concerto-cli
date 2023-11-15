@@ -786,4 +786,86 @@ describe('concerto-cli', () => {
             dir.cleanup();
         });
     });
+
+    describe('#extract-decorator', () => {
+        it('should extract the vocabularies and decorators from source model and should not alter the original model by default', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const options = {
+                locale: 'en-gb',
+                output: dir.path
+            };
+            const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
+            const expectedModels = fs.readFileSync(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'),'utf-8');
+            const expectedVocabs = 'locale: en-gb\nnamespace: test@1.0.0\ndeclarations:\n  - Person: Person Class\n    properties:\n      - firstName: HI\n      - bio: some\n        cus: con\n';
+            const expectedDecos = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data', 'extract-expected-deco.json'),'utf-8'));
+            const result = await Commands.extractDecorators(model, options);
+            const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
+            const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_0.json'),'utf-8'));
+            result.should.include('Extracted Decorators and models in');
+            actualDecorators.should.eql(expectedDecos);
+            actualVocabs.should.eql(expectedVocabs);
+            actualModels.replace(/[\r\n]+/g, '\n').trim().should.eql(expectedModels.replace(/[\r\n]+/g, '\n').trim());
+            dir.cleanup();
+        });
+        it('should throw error if data is invalid', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const model = [path.resolve(__dirname, 'models', 'decorate-invalid-model.cto')];
+            const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-vocabs-and-deco.json'),'utf-8');
+            try {
+                const result =await Commands.extractDecorators(model);
+                result.should.eql(expected);
+            } catch (err) {
+                (typeof err).should.equal('object');
+            }
+            dir.cleanup();
+        });
+        it('should extract the vocabularies and decorators from source model and update the source model depending on options passed', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const options = {
+                locale: 'en-gb',
+                removeDecoratorsFromModel: true,
+                output: dir.path
+            };
+            const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
+            const expectedModels = fs.readFileSync(path.resolve(__dirname, 'models', 'extracted-model.cto'),'utf-8');
+            const expectedVocabs = 'locale: en-gb\nnamespace: test@1.0.0\ndeclarations:\n  - Person: Person Class\n    properties:\n      - firstName: HI\n      - bio: some\n        cus: con\n';
+            const expectedDecos = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data', 'extract-expected-deco.json'),'utf-8'));
+            const result = await Commands.extractDecorators(model, options);
+            const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
+            const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_0.json'),'utf-8'));
+            result.should.include('Extracted Decorators and models');
+            actualDecorators.should.eql(expectedDecos);
+            actualVocabs.should.eql(expectedVocabs);
+            actualModels.replace(/[\r\n]+/g, '\n').trim().should.eql(expectedModels.replace(/[\r\n]+/g, '\n').trim());
+            dir.cleanup();
+        });
+        it('should extract the vocabularies and decorators from source model and write result in given folder', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const options = {
+                locale: 'en-gb',
+                output: dir.path
+            };
+            const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
+            await Commands.extractDecorators(model, options);
+            const files = fs.readdirSync(dir.path);
+            const threeFilesExist = files.length === 3;
+            expect(threeFilesExist).to.be.true;
+            dir.cleanup();
+        });
+        it('should extract the vocabularies and decorators from source model and write result in given folder (create folder if does not exist)', async () => {
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const options = {
+                locale: 'en-gb',
+                output: dir.path + '_output'
+            };
+            const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
+            await Commands.extractDecorators(model, options);
+            const files = fs.readdirSync(dir.path + '_output');
+            const threeFilesExist = files.length === 3;
+            expect(threeFilesExist).to.be.true;
+            dir.cleanup();
+        });
+    });
 });
