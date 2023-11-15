@@ -477,6 +477,7 @@ require('yargs')
         yargs.option('output', {
             describe: 'output directory path',
             type: 'string',
+            default: 'output'
         });
     }, argv => {
         const options = {
