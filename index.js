@@ -395,11 +395,17 @@ require('yargs')
             type: 'boolean',
             default: false,
         });
+        yargs.option('disableValidation', {
+            describe: 'Do not validate generated output',
+            type: 'boolean',
+            default: false
+        });
     }, argv => {
         return Commands.generate(argv.model, argv.concept, argv.mode, {
             optionalFields: argv.includeOptionalFields,
             metamodel: argv.metamodel,
             strict: argv.strict,
+            disableValidation: argv.disableValidation
         })
             .then(obj => {
                 console.log(JSON.stringify(obj, null, 2));
