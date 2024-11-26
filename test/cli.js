@@ -721,7 +721,8 @@ describe('concerto-cli', () => {
                 format:'json'
             };
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            let jsonObj = structuredClone(result);
+            const clone = JSON.stringify(result);
+            let jsonObj = JSON.parse(clone);
             (typeof jsonObj).should.equal('object');
             dir.cleanup();
         });
