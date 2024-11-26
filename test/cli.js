@@ -20,11 +20,13 @@ const path = require('path');
 const tmp = require('tmp-promise');
 const fs = require('fs');
 const sinon = require('sinon');
+const fetch = require('node-fetch');
 
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
+global.fetch = fetch;
 
 const Commands = require('../lib/commands');
 const { Parser } = require('@accordproject/concerto-cto');
@@ -694,7 +696,7 @@ describe('concerto-cli', () => {
             };
             const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-dcs.cto'),'utf-8');
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            result[1].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
             dir.cleanup();
         });
 
@@ -708,7 +710,7 @@ describe('concerto-cli', () => {
             };
             const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-vocabs-only.cto'),'utf-8');
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            result[1].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
             dir.cleanup();
         });
 
@@ -721,7 +723,8 @@ describe('concerto-cli', () => {
                 format:'json'
             };
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            let jsonObj=JSON.parse(result);
+            const clone = JSON.stringify(result);
+            let jsonObj = JSON.parse(clone);
             (typeof jsonObj).should.equal('object');
             dir.cleanup();
         });
@@ -782,7 +785,7 @@ describe('concerto-cli', () => {
             };
             const expected = fs.readFileSync(path.resolve(__dirname, 'models', 'decorate-model-expected-with-dependency.cto'),'utf-8');
             const result =await Commands.decorate(model,decorators,vocabs,options);
-            result[0].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
+            result[1].replace(/[\r\n]+/g, '\n').should.equal(expected.replace(/[\r\n]+/g, '\n'));
             dir.cleanup();
         });
     });
@@ -801,7 +804,7 @@ describe('concerto-cli', () => {
             const result = await Commands.extractDecorators(model, options);
             const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
             const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
-            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_0.json'),'utf-8'));
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_2.json'),'utf-8'));
             result.should.include('Extracted Decorators and models in');
             actualDecorators.should.eql(expectedDecos);
             actualVocabs.should.eql(expectedVocabs);
@@ -834,7 +837,7 @@ describe('concerto-cli', () => {
             const result = await Commands.extractDecorators(model, options);
             const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
             const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
-            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_0.json'),'utf-8'));
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_2.json'),'utf-8'));
             result.should.include('Extracted Decorators and models');
             actualDecorators.should.eql(expectedDecos);
             actualVocabs.should.eql(expectedVocabs);
@@ -850,7 +853,7 @@ describe('concerto-cli', () => {
             const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
             await Commands.extractDecorators(model, options);
             const files = fs.readdirSync(dir.path);
-            const threeFilesExist = files.length === 3;
+            const threeFilesExist = files.length === 6;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
         });
@@ -863,7 +866,7 @@ describe('concerto-cli', () => {
             const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
             await Commands.extractDecorators(model, options);
             const files = fs.readdirSync(dir.path + '_output');
-            const threeFilesExist = files.length === 3;
+            const threeFilesExist = files.length === 6;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
         });
