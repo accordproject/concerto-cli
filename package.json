@@ -49,7 +49,7 @@
     "@accordproject/concerto-codegen": "3.30.2",
     "@accordproject/concerto-core": "3.19.8",
     "@accordproject/concerto-cto": "3.19.8",
-    "@accordproject/concerto-metamodel": "3.10.2",
+    "@accordproject/concerto-metamodel": "3.10.3",
     "@accordproject/concerto-util": "3.19.8",
     "ansi-colors": "4.1.3",
     "glob": "^7.2.0",
