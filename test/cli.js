@@ -30,6 +30,7 @@ global.fetch = fetch;
 
 const Commands = require('../lib/commands');
 const { Parser } = require('@accordproject/concerto-cto');
+const { MetaModelUtil } = require('@accordproject/concerto-metamodel');
 
 describe('concerto-cli', () => {
     const models = [path.resolve(__dirname, 'models/dom.cto'),path.resolve(__dirname, 'models/money.cto')];
@@ -322,6 +323,46 @@ describe('concerto-cli', () => {
             const result = fs.readFileSync(output.path, 'utf-8');
             result.should.equal(expected);
             output.cleanup();
+        });
+        it('should handle invalid JSON metamodel content', async () => {
+            const tempFile = await tmp.file({ unsafeCleanup: true });
+            fs.writeFileSync(tempFile.path, 'This is not valid JSON', 'utf-8');
+            try {
+                await Commands.print(tempFile.path);
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+                err.message.should.match(/Failed to parse metamodel/);
+            } finally {
+                tempFile.cleanup();
+            }
+        });
+        it('should handle file not found errors', async () => {
+            try {
+                await Commands.print('/path/to/nonexistent/file.json');
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+            }
+        });
+        it('should handle invalid AST validation in metamodel', async () => {
+            const tempFile = await tmp.file({ unsafeCleanup: true });
+            const invalidAST = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                imports: [],
+                declarations: []
+            };
+            fs.writeFileSync(tempFile.path, JSON.stringify(invalidAST), 'utf-8');
+            try {
+                await Commands.print(tempFile.path);
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+                err.message.should.include('Invalid Concerto AST:');
+                err.message.should.include('Model must have a namespace');
+            } finally {
+                tempFile.cleanup();
+            }
         });
     });
 
@@ -869,6 +910,212 @@ describe('concerto-cli', () => {
             const threeFilesExist = files.length === 6;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
+        });
+    });
+
+    describe('#validateAST', () => {
+        it('should validate a valid Model AST', () => {
+            const validModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+
+            const result = Commands.validateAST(validModel);
+            result.should.have.property('valid', true);
+            result.should.have.property('errors').with.lengthOf(0);
+        });
+
+        it('should validate a Models container with valid models', () => {
+            const validModels = {
+                $class: 'concerto.metamodel@1.0.0.Models',
+                models: [
+                    {
+                        $class: 'concerto.metamodel@1.0.0.Model',
+                        namespace: 'org.example1@1.0.0',
+                        imports: [],
+                        declarations: []
+                    },
+                    {
+                        $class: 'concerto.metamodel@1.0.0.Model',
+                        namespace: 'org.example2@1.0.0',
+                        imports: [],
+                        declarations: []
+                    }
+                ]
+            };
+
+            const result = Commands.validateAST(validModels);
+            result.should.have.property('valid', true);
+            result.should.have.property('errors').with.lengthOf(0);
+        });
+
+        it('should detect missing namespace in Model', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                imports: [],
+                declarations: []
+            };
+
+            const result = Commands.validateAST(invalidModel);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Model must have a namespace');
+        });
+
+        it('should detect missing declarations array in Model', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: []
+            };
+
+            const result = Commands.validateAST(invalidModel);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Model declarations must be an array');
+        });
+
+        it('should detect invalid declaration without $class', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: [
+                    {
+                        name: 'MyClass',
+                        properties: []
+                    }
+                ]
+            };
+
+            const result = Commands.validateAST(invalidModel);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Declaration at index 0 must have a $class property');
+        });
+
+        it('should detect invalid declaration without name', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: [
+                    {
+                        $class: 'concerto.metamodel@1.0.0.ConceptDeclaration',
+                        properties: []
+                    }
+                ]
+            };
+
+            const result = Commands.validateAST(invalidModel);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Declaration at index 0 must have a name property');
+        });
+
+        it('should detect missing models array in Models container', () => {
+            const invalidModels = {
+                $class: 'concerto.metamodel@1.0.0.Models',
+            };
+
+            const result = Commands.validateAST(invalidModels);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Models must have a models array');
+        });
+
+        it('should detect invalid model in Models container', () => {
+            const invalidModels = {
+                $class: 'concerto.metamodel@1.0.0.Models',
+                models: [
+                    {
+                        $class: 'concerto.metamodel@1.0.0.Model',
+                        imports: [],
+                        declarations: []
+                    }
+                ]
+            };
+
+            const result = Commands.validateAST(invalidModels);
+            result.should.have.property('valid', false);
+            result.errors[0].should.include('Model at index 0 is invalid');
+        });
+
+        it('should detect missing $class property', () => {
+            const invalidAST = {
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+
+            const result = Commands.validateAST(invalidAST);
+            result.should.have.property('valid', false);
+            result.errors.should.include('AST must have a $class property defining its type');
+        });
+
+        it('should validate with strict mode off', () => {
+            const validModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+            const result = Commands.validateAST(validModel, false);
+            result.should.have.property('valid', true);
+            result.should.have.property('errors').with.lengthOf(0);
+        });
+
+        it('should handle null/undefined AST', () => {
+            const result = Commands.validateAST(null);
+            result.should.have.property('valid', false);
+            result.errors.should.include('AST is null or undefined');
+        });
+
+        it('should handle validation errors from MetaModelUtil', () => {
+            const originalValidateMetaModel = MetaModelUtil.validateMetaModel;
+            MetaModelUtil.validateMetaModel = function() {
+                throw new Error('Validation failed');
+            };
+            const validModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+            try {
+                const result = Commands.validateAST(validModel);
+                result.should.have.property('valid', false);
+                result.errors.should.include('MetaModel validation error: Validation failed');
+            } finally {
+                MetaModelUtil.validateMetaModel = originalValidateMetaModel;
+            }
+        });
+
+        it('should handle unexpected errors during validation', () => {
+            const badModel = {};
+            Object.defineProperty(badModel, '$class', {
+                get: function() { throw new Error('Unexpected error'); }
+            });
+            const result = Commands.validateAST(badModel);
+            result.should.have.property('valid', false);
+            result.errors.should.include('Unexpected error during validation: Unexpected error');
+        });
+
+        it('should handle AST with unsupported type', () => {
+            const unsupportedModel = {
+                $class: 'concerto.metamodel@1.0.0.UnknownType',
+                someProperty: 'test'
+            };
+            const result = Commands.validateAST(unsupportedModel);
+            result.should.have.property('valid', true);
+            result.should.have.property('errors').with.lengthOf(0);
+        });
+
+        it('should validate a Models container with an empty models array', () => {
+            const emptyModelsContainer = {
+                $class: 'concerto.metamodel@1.0.0.Models',
+                models: []
+            };
+            const result = Commands.validateAST(emptyModelsContainer);
+            result.should.have.property('valid', true);
+            result.should.have.property('errors').with.lengthOf(0);
         });
     });
 });

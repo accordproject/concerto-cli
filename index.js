@@ -19,6 +19,7 @@ const Logger = require('@accordproject/concerto-util').Logger;
 const fs = require('fs');
 const { glob } = require('glob');
 const Commands = require('./lib/commands');
+const c = require('ansi-colors');
 
 require('yargs')
     .scriptName('concerto')
@@ -261,6 +262,37 @@ require('yargs')
             .catch((err) => {
                 Logger.error(err.message);
             });
+    })
+    .command('validate-ast', 'validate a JSON syntax tree against the Concerto metamodel', (yargs) => {
+        yargs.demandOption(['input'], 'Please provide an input Concerto syntax tree');
+        yargs.option('input', {
+            describe: 'the metamodel to validate',
+            type: 'string'
+        });
+        yargs.option('strict', {
+            describe: 'perform strict validation',
+            type: 'boolean',
+            default: true
+        });
+    }, (argv) => {
+        try {
+            const inputString = fs.readFileSync(argv.input, 'utf8');
+            const json = JSON.parse(inputString);
+            const validationResult = Commands.validateAST(json, argv.strict);
+            if (validationResult.valid) {
+                Logger.info(c.green('AST is valid'));
+                return true;
+            } else {
+                Logger.error('AST validation failed:');
+                validationResult.errors.forEach(error => {
+                    Logger.error(` - ${error}`);
+                });
+                process.exit(1);
+            }
+        } catch (err) {
+            Logger.error(`Error validating AST: ${err.message}`);
+            process.exit(1);
+        }
     })
     .command('version <release>', 'modify the version of one or more model files', yargs => {
         yargs.demandOption(['model'], 'Please provide Concerto model(s)');
