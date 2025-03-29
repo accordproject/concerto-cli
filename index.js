@@ -19,7 +19,6 @@ const Logger = require('@accordproject/concerto-util').Logger;
 const fs = require('fs');
 const { glob } = require('glob');
 const Commands = require('./lib/commands');
-const c = require('ansi-colors');
 
 require('yargs')
     .scriptName('concerto')
@@ -278,19 +277,9 @@ require('yargs')
         try {
             const inputString = fs.readFileSync(argv.input, 'utf8');
             const json = JSON.parse(inputString);
-            const validationResult = Commands.validateAST(json, argv.strict);
-            if (validationResult.valid) {
-                Logger.info(c.green('AST is valid'));
-                return true;
-            } else {
-                Logger.error('AST validation failed:');
-                validationResult.errors.forEach(error => {
-                    Logger.error(` - ${error}`);
-                });
-                process.exit(1);
-            }
+            Commands.validateAST(json);
         } catch (err) {
-            Logger.error(`Error validating AST: ${err.message}`);
+            Logger.error('Error validating AST');
             process.exit(1);
         }
     })
