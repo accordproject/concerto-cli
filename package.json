@@ -52,7 +52,7 @@
     "@accordproject/concerto-metamodel": "3.11.0",
     "@accordproject/concerto-util": "3.20.4",
     "ansi-colors": "4.1.3",
-    "glob": "^7.2.0",
+    "glob": "^7.2.3",
     "randexp": "^0.5.3",
     "semver": "7.5.2",
     "yargs": "17.3.1"

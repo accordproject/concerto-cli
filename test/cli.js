@@ -43,6 +43,45 @@ describe('concerto-cli', () => {
         sinon.restore();
     });
 
+    describe('#resolveFilePaths', () => {
+        it('resolves file paths with glob patterns', () => {
+            const filePaths = [
+                path.resolve(__dirname, 'models', '*.cto'),
+                path.resolve(__dirname, 'models', 'a?b.cto'),
+                path.resolve(__dirname, 'models', '{**/*.cto,**/*.json}'),
+                path.resolve(__dirname, 'data', 'input1.json')
+            ];
+            const result = Commands.resolveFilePaths(filePaths);
+
+            // Normalize paths for comparison
+            const normalizedResult = result.map(p => path.normalize(p));
+
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'models', 'dom.cto')));
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'models', 'money.cto')));
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'data', 'input1.json')));
+            expect(normalizedResult.length).to.equal(new Set(normalizedResult).size);
+        });
+
+        it('handles regular paths without glob patterns', () => {
+            const filePaths = [
+                path.resolve(__dirname, 'models/dom.cto'),
+                path.resolve(__dirname, 'models/money.cto'),
+            ];
+            const result = Commands.resolveFilePaths(filePaths);
+            expect(result).to.deep.equal(filePaths);
+        });
+
+        it('avoids adding duplicate paths', () => {
+            const filePaths = [
+                path.resolve(__dirname, 'models/dom.cto'),
+                path.resolve(__dirname, 'models/dom.cto'),
+            ];
+            const result = Commands.resolveFilePaths(filePaths);
+            expect(result.length).to.equal(1);
+            expect(result[0]).to.equal(path.resolve(__dirname, 'models/dom.cto'));
+        });
+    });
+
     describe('#validateValidateArgs', () => {
         it('no args specified', () => {
             process.chdir(path.resolve(__dirname, 'data'));
