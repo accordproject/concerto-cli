@@ -46,17 +46,20 @@ describe('concerto-cli', () => {
     describe('#resolveFilePaths', () => {
         it('resolves file paths with glob patterns', () => {
             const filePaths = [
-                path.resolve(__dirname, 'models/*.cto'),
-                path.resolve(__dirname, 'models/a?b.cto'),
-                path.resolve(__dirname, 'models/{**/*.cto,**/*.json}'),
-                path.resolve(__dirname, 'data/input1.json')
+                path.resolve(__dirname, 'models', '*.cto'),
+                path.resolve(__dirname, 'models', 'a?b.cto'),
+                path.resolve(__dirname, 'models', '{**/*.cto,**/*.json}'),
+                path.resolve(__dirname, 'data', 'input1.json')
             ];
             const result = Commands.resolveFilePaths(filePaths);
-            expect(result).to.include(path.resolve(__dirname, 'models/dom.cto'));
-            expect(result).to.include(path.resolve(__dirname, 'models/money.cto'));
-            expect(result).to.include(path.resolve(__dirname, 'data/input1.json'));
-            // No duplicates should be present
-            expect(result.length).to.equal(new Set(result).size);
+
+            // Normalize paths for comparison
+            const normalizedResult = result.map(p => path.normalize(p));
+
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'models', 'dom.cto')));
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'models', 'money.cto')));
+            expect(normalizedResult).to.include(path.normalize(path.resolve(__dirname, 'data', 'input1.json')));
+            expect(normalizedResult.length).to.equal(new Set(normalizedResult).size);
         });
 
         it('handles regular paths without glob patterns', () => {
