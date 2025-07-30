@@ -31,6 +31,7 @@ global.fetch = fetch;
 const Commands = require('../lib/commands');
 const { Parser } = require('@accordproject/concerto-cto');
 
+
 describe('concerto-cli', () => {
     const models = [path.resolve(__dirname, 'models/dom.cto'),path.resolve(__dirname, 'models/money.cto')];
     const offlineModels = [path.resolve(__dirname, 'models/contract.cto'),path.resolve(__dirname, 'models/dom.cto'),path.resolve(__dirname, 'models/money.cto'),path.resolve(__dirname, 'models/person.cto')];
@@ -361,6 +362,45 @@ describe('concerto-cli', () => {
             const result = fs.readFileSync(output.path, 'utf-8');
             result.should.equal(expected);
             output.cleanup();
+        });
+        it('should handle invalid JSON metamodel content', async () => {
+            const tempFile = await tmp.file({ unsafeCleanup: true });
+            fs.writeFileSync(tempFile.path, 'This is not valid JSON', 'utf-8');
+            try {
+                await Commands.print(tempFile.path);
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+                err.message.should.match(/Unexpected token/);
+            } finally {
+                tempFile.cleanup();
+            }
+        });
+        it('should handle file not found errors', async () => {
+            try {
+                await Commands.print('/path/to/nonexistent/file.json');
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+            }
+        });
+        it('should handle invalid AST validation in metamodel', async () => {
+            const tempFile = await tmp.file({ unsafeCleanup: true });
+            const invalidAST = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                imports: [],
+                declarations: []
+            };
+            fs.writeFileSync(tempFile.path, JSON.stringify(invalidAST), 'utf-8');
+            try {
+                await Commands.print(tempFile.path);
+                expect.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an.instanceOf(Error);
+                err.message.should.include('Invalid Concerto Metamodel AST:');
+            } finally {
+                tempFile.cleanup();
+            }
         });
     });
 
@@ -908,6 +948,80 @@ describe('concerto-cli', () => {
             const threeFilesExist = files.length === 6;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
+        });
+    });
+
+    describe('#validateAST', () => {
+        it('should validate a valid Model AST', () => {
+            const validModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+
+            const result = Commands.validateAST(validModel);
+            result.should.equal('Concerto Metamodel AST is valid.');
+        });
+
+        it('should detect missing namespace in Model', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                imports: [],
+                declarations: []
+            };
+
+            (() => Commands.validateAST(invalidModel)).should.throw('The instance "concerto.metamodel@1.0.0.Model" is missing the required field "namespace".');
+        });
+
+        it('should detect invalid declaration without $class', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: [
+                    {
+                        name: 'MyClass',
+                        properties: []
+                    }
+                ]
+            };
+
+            (() => Commands.validateAST(invalidModel)).should.throw('Cannot instantiate the abstract type "Declaration" in the "concerto.metamodel@1.0.0" namespace.');
+        });
+
+        it('should detect invalid declaration without name', () => {
+            const invalidModel = {
+                $class: 'concerto.metamodel@1.0.0.Model',
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: [
+                    {
+                        $class: 'concerto.metamodel@1.0.0.ConceptDeclaration',
+                        properties: []
+                    }
+                ]
+            };
+
+            (() => Commands.validateAST(invalidModel)).should.throw('The instance "concerto.metamodel@1.0.0.ConceptDeclaration" is missing the required field "name".');
+        });
+
+        it('should detect missing $class property', () => {
+            const invalidAST = {
+                namespace: 'org.example@1.0.0',
+                imports: [],
+                declarations: []
+            };
+
+            (() => Commands.validateAST(invalidAST)).should.throw('Invalid JSON data. Does not contain a $class type identifier.');
+        });
+
+        it('should handle AST with unsupported type', () => {
+            const unsupportedModel = {
+                $class: 'concerto.metamodel@1.0.0.UnknownType',
+                someProperty: 'test'
+            };
+            (() => Commands.validateAST(unsupportedModel)).should.throw('Type "UnknownType" is not defined in namespace "concerto.metamodel@1.0.0".');
         });
     });
 });
