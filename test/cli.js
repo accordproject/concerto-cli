@@ -910,4 +910,123 @@ describe('concerto-cli', () => {
             dir.cleanup();
         });
     });
+
+    describe('#convert-dcs', () => {
+        const dcsJsonFile = path.resolve(__dirname, 'data/decorate-dcs.json');
+        const dcsYamlFile = path.resolve(__dirname, 'data/decorate-dcs.yaml');
+        const expectedJsonContent = fs.readFileSync(dcsJsonFile, 'utf8');
+        const expectedYamlContent = fs.readFileSync(dcsYamlFile, 'utf8');
+
+        it('should convert DCS JSON to YAML (console output)', async () => {
+            const result = await Commands.convertDcs(dcsJsonFile);
+            result.should.be.a('string');
+            result.should.equal(expectedYamlContent);
+        });
+
+        it('should convert DCS YAML to JSON (console output)', async () => {
+            const result = await Commands.convertDcs(dcsYamlFile);
+            result.should.be.an('object');
+            JSON.stringify(result).should.equal(JSON.stringify(JSON.parse(expectedJsonContent)));
+        });
+
+        it('should convert DCS JSON to YAML (file output)', async () => {
+            const outputFile = '/test/output.yaml';
+            const writeFileStub = sinon.stub(fs, 'writeFileSync');
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').withArgs(dcsJsonFile, 'utf-8').returns(expectedJsonContent);
+            sinon.stub(fs, 'mkdirSync');
+
+            const result = await Commands.convertDcs(dcsJsonFile, outputFile);
+            result.should.include('Successfully converted');
+            writeFileStub.should.have.been.calledWith(outputFile, expectedYamlContent);
+        });
+
+        it('should convert DCS YAML to JSON (file output)', async () => {
+            const outputFile = '/test/output.json';
+            const writeFileStub = sinon.stub(fs, 'writeFileSync');
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').withArgs(dcsYamlFile, 'utf-8').returns(expectedYamlContent);
+            sinon.stub(fs, 'mkdirSync');
+
+            const result = await Commands.convertDcs(dcsYamlFile, outputFile);
+            result.should.include('Successfully converted');
+            writeFileStub.should.have.been.calledWith(outputFile, JSON.stringify(JSON.parse(expectedJsonContent), null, 4));
+        });
+
+        it('should create output directory if it does not exist', async () => {
+            const outputFile = '/test/new/nested/directory/output.yaml';
+            const existsStub = sinon.stub(fs, 'existsSync');
+            existsStub.withArgs(dcsJsonFile).returns(true);
+            existsStub.withArgs('/test/new/nested/directory').returns(false);
+            sinon.stub(fs, 'readFileSync').withArgs(dcsJsonFile, 'utf-8').returns(expectedJsonContent);
+            const mkdirSyncStub = sinon.stub(fs, 'mkdirSync');
+            sinon.stub(fs, 'writeFileSync');
+
+            const result = await Commands.convertDcs(dcsJsonFile, outputFile);
+            result.should.include('Successfully converted');
+            mkdirSyncStub.should.have.been.calledWith('/test/new/nested/directory', { recursive: true });
+        });
+
+        it('should throw error if input file does not exist', async () => {
+            const nonExistentFile = '/test/nonexistent.json';
+            sinon.stub(fs, 'existsSync').returns(false);
+
+            try {
+                await Commands.convertDcs(nonExistentFile);
+                throw new Error('Should have thrown error');
+            } catch (err) {
+                err.message.should.include('DCS file does not exist');
+            }
+        });
+
+        it('should throw error if input has unsupported file format', async () => {
+            const unsupportedFile = '/test/test.txt';
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').returns('some content');
+
+            try {
+                await Commands.convertDcs(unsupportedFile);
+                throw new Error('Should have thrown error');
+            } catch (err) {
+                err.message.should.include('Unsupported input file format');
+            }
+        });
+
+        it('should throw error if output extension mismatches when converting JSON to YAML', async () => {
+            const wrongOutputFile = '/test/output.json';
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').withArgs(dcsJsonFile, 'utf-8').returns(expectedJsonContent);
+
+            try {
+                await Commands.convertDcs(dcsJsonFile, wrongOutputFile);
+                throw new Error('Should have thrown error');
+            } catch (err) {
+                err.message.should.include('Output file extension should be .yaml or .yml when converting from JSON');
+            }
+        });
+
+        it('should throw error if output extension mismatches when converting YAML to JSON', async () => {
+            const wrongOutputFile = '/test/output.yaml';
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').withArgs(dcsYamlFile, 'utf-8').returns(expectedYamlContent);
+
+            try {
+                await Commands.convertDcs(dcsYamlFile, wrongOutputFile);
+                throw new Error('Should have thrown error');
+            } catch (err) {
+                err.message.should.include('Output file extension should be .json when converting from YAML');
+            }
+        });
+
+        it('should handle .yml extension', async () => {
+            const ymlFile = '/test/test.yml';
+            sinon.stub(fs, 'existsSync').returns(true);
+            sinon.stub(fs, 'readFileSync').returns(expectedYamlContent);
+
+            const result = await Commands.convertDcs(ymlFile);
+            result.should.be.an('object');
+            JSON.stringify(result).should.equal(JSON.stringify(JSON.parse(expectedJsonContent)));
+        });
+
+    });
 });
