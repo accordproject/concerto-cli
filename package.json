@@ -47,7 +47,7 @@
   "dependencies": {
     "@accordproject/concerto-analysis": "3.20.4",
     "@accordproject/concerto-codegen": "3.30.5",
-    "@accordproject/concerto-core": "3.20.4",
+    "@accordproject/concerto-core": "3.23.0",
     "@accordproject/concerto-cto": "3.20.4",
     "@accordproject/concerto-metamodel": "3.11.0",
     "@accordproject/concerto-util": "3.20.4",

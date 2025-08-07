@@ -1,13 +1,13 @@
 {
-    "$class": "org.accordproject.decoratorcommands.DecoratorCommandSet",
+    "$class": "org.accordproject.decoratorcommands@0.4.0.DecoratorCommandSet",
     "name": "pii",
     "version": "1.0.0",
     "commands": [
       {
-        "$class": "org.accordproject.decoratorcommands.Command",
+        "$class": "org.accordproject.decoratorcommands@0.4.0.Command",
         "type": "UPSERT",
         "target": {
-          "$class": "org.accordproject.decoratorcommands.CommandTarget",
+          "$class": "org.accordproject.decoratorcommands@0.4.0.CommandTarget",
           "property": "ssn"
         },
         "decorator": {
@@ -18,10 +18,10 @@
         }
       },
       {
-        "$class": "org.accordproject.decoratorcommands.Command",
+        "$class": "org.accordproject.decoratorcommands@0.4.0.Command",
         "type": "UPSERT",
         "target": {
-          "$class": "org.accordproject.decoratorcommands.CommandTarget",
+          "$class": "org.accordproject.decoratorcommands@0.4.0.CommandTarget",
           "property": "bar"
         },
         "decorator": {
@@ -32,10 +32,10 @@
         }
       },
       {
-        "$class": "org.accordproject.decoratorcommands.Command",
+        "$class": "org.accordproject.decoratorcommands@0.4.0.Command",
         "type": "UPSERT",
         "target": {
-          "$class": "org.accordproject.decoratorcommands.CommandTarget",
+          "$class": "org.accordproject.decoratorcommands@0.4.0.CommandTarget",
           "type": "concerto.metamodel@1.0.0.ObjectProperty"
         },
         "decorator": {
