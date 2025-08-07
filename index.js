@@ -499,6 +499,34 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('convert-dcs', 'convert decorator command set between JSON and YAML formats', (yargs) => {
+        yargs.demandOption('dcs', 'Please provide a DCS file');
+        yargs.option('dcs', {
+            describe: 'The input DCS file (.json or .yaml/.yml)',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'The output file path (.json or .yaml/.yml). If not provided, outputs to console',
+            type: 'string'
+        });
+    }, (argv) => {
+        return Commands.convertDcs(argv.dcs, argv.output)
+            .then((result) => {
+                if (!argv.output) {
+                    // Output to console with proper formatting
+                    if (typeof result === 'string') {
+                        console.log(result);
+                    } else {
+                        console.log(JSON.stringify(result, null, 4));
+                    }
+                } else {
+                    Logger.info(result);
+                }
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false
