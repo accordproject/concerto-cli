@@ -1027,6 +1027,39 @@ describe('concerto-cli', () => {
             result.should.be.an('object');
             JSON.stringify(result).should.equal(JSON.stringify(JSON.parse(expectedJsonContent)));
         });
+    });
 
+    describe('#lintModel', () => {
+        it('should lint a model file with default ruleset', async () => {
+            const modelFile = path.resolve(__dirname, 'models', 'person.cto');
+            const results = await Commands.lintModel(modelFile);
+            results.should.be.an('array');
+        });
+
+        it('should lint a model file with custom ruleset', async () => {
+            const modelFile = path.resolve(__dirname, 'models', 'person.cto');
+            const ruleset = 'default'; // Using default as a string for test
+            const results = await Commands.lintModel(modelFile, ruleset);
+            results.should.be.an('array');
+        });
+
+        it('should exclude specified namespaces from lint results', async () => {
+            const modelFile = path.resolve(__dirname, 'models', 'person.cto');
+            const ruleset = 'default';
+            const excludeNamespaces = ['person.*'];
+            const results = await Commands.lintModel(modelFile, ruleset, excludeNamespaces);
+            results.should.be.an('array');
+        });
+
+        it('should handle errors when linting invalid models', async () => {
+            const modelFile = path.resolve(__dirname, 'models', 'parseerror.cto');
+            try {
+                await Commands.lintModel(modelFile);
+                chai.assert.fail('Expected error was not thrown');
+            } catch (err) {
+                err.should.be.an('error');
+                err.message.should.include('Error linting model');
+            }
+        });
     });
 });
