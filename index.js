@@ -527,6 +527,62 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('lint','lint Concerto model file', (yargs) => {
+        yargs.demandOption(['model'], 'Please provide Concerto model');
+        yargs.option('model', {
+            describe: 'Concerto model file to lint',
+            type: 'string',
+            array: false
+        });
+        yargs.option('ruleset', {
+            describe: 'Path to a custom Spectral ruleset or `default` to use the built-in ruleset.',
+            type: 'string',
+        });
+        yargs.option('exclude', {
+            describe: 'One or more namespaces to exclude from linting results',
+            type: 'string',
+            default: ['concerto.*', 'org.accord.*'],
+            array: true
+        });
+        yargs.option('json', {
+            describe: 'have the linting results in the JSON format',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        return Commands.lintModel(argv.model, argv.ruleset, argv.exclude)
+            .then((results) => {
+                if(results.length === 0) {
+                    console.log('No linting errors found.');
+                    return;
+                }
+                if(argv.json){
+                    console.log(JSON.stringify(results, null, 4));
+                }
+                else {
+                    // Format the results for better readability
+                    const severityColors = {
+                        'error': '\x1b[31m', // Red
+                        'warning': '\x1b[33m', // Yellow
+                        'info': '\x1b[36m', // Cyan
+                        'hint': '\x1b[90m' // Gray
+                    };
+                    const reset = '\x1b[0m';
+                    console.log('\nLinting Results:');
+                    console.log('===============\n');
+                    results.forEach((result, index) => {
+                        const color = severityColors[result.severity] || reset;
+                        console.log(`${index + 1}. ${color}[${result.severity.toUpperCase()}]${reset} ${result.code}: ${result.message}`);
+                        console.log(`   Namespace: ${result.namespace}`);
+                        console.log(`   Path: ${result.path.join('.')}\n`);
+                    });
+                    console.log(`Total: ${results.length} issue(s) found.`);
+                }
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false
