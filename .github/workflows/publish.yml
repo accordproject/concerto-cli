@@ -4,8 +4,10 @@ on:
   release:
     types:
       - published
+
 permissions:
   id-token: write  # Required for OIDC / npmjs publish
+
 jobs:
   publish:
     name: Publish to npm
