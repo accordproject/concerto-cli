@@ -25,7 +25,11 @@
     "licchk": "license-check-and-add",
     "postlicchk": "npm run doc",
     "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
-    "test": "nyc mocha --recursive -t 10000"
+    "test": "nyc mocha --recursive -t 10000",
+    "lint:deps": "syncpack lint",
+    "lint:deps:fix": "syncpack fix",
+    "lint:lockfile": "lockfile-lint --path package-lock.json --type npm --allowed-hosts npm --validate-https",
+    "preinstall": "npm run lint:lockfile && npm run lint:deps"
   },
   "bugs": {
     "url": "https://github.com/accordproject/concerto/issues"
@@ -35,14 +39,16 @@
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "eslint": "8.2.0",
-    "jsdoc": "^4.0.2",
+    "jsdoc": "4.0.2",
     "license-check-and-add": "2.3.6",
     "mocha": "10.8.2",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "2.7.0",
     "nyc": "15.1.0",
     "sinon": "12.0.0",
     "sinon-chai": "3.7.0",
-    "tmp-promise": "3.0.2"
+    "tmp-promise": "3.0.2",
+    "lockfile-lint": "4.14.1",
+    "syncpack": "14.0.0-alpha.32"
   },
   "dependencies": {
     "@accordproject/concerto-analysis": "3.25.0",
@@ -53,8 +59,8 @@
     "@accordproject/concerto-util": "3.25.0",
     "@accordproject/concerto-linter": "3.25.0",
     "ansi-colors": "4.1.3",
-    "glob": "^7.2.3",
-    "randexp": "^0.5.3",
+    "glob": "7.2.3",
+    "randexp": "0.5.3",
     "semver": "7.5.2",
     "yargs": "17.3.1"
   },
