@@ -14,8 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/concerto.git",
-    "directory": "packages/concerto-cli"
+    "url": "git+https://github.com/accordproject/concerto-cli.git"
   },
   "scripts": {
     "coverage": "node ./scripts/coverage.js \"packages/concerto-*\" && nyc report -t coverage --cwd . --report-dir coverage --reporter=lcov && cat ./coverage/lcov.info",
