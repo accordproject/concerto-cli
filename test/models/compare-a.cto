@@ -1,4 +1,4 @@
-namespace compare
+namespace compare@1.0.0
 
 concept Thing {
     o String value

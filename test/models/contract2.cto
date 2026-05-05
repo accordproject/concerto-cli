@@ -1,4 +1,4 @@
-namespace org.accordproject.cicero.contract
+namespace org.accordproject.cicero.contract@0.2.0
 
 asset AccordContractState identified by stateId {
   o String stateId

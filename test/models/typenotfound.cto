@@ -1,4 +1,4 @@
-namespace org.accordproject.money
+namespace org.accordproject.money@1.0.0
 
 /**
  * Represents an amount of Cryptocurrency
