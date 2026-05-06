@@ -1,3 +1,4 @@
+@Term("Test")
 namespace test@1.0.0
 
 @Term("Person")

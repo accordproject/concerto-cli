@@ -1,6 +1,6 @@
 {
   "$class": "concerto.metamodel@1.0.0.Model",
-  "namespace": "compare",
+  "namespace": "compare@1.0.0",
   "imports": [],
   "declarations": [
     {

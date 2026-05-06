@@ -112,7 +112,7 @@ describe('concerto-cli', () => {
                 const result = await Commands.validate(input2, models, {offline:false});
                 JSON.parse(result).should.deep.equal(JSON.parse(inputText2));
             } catch (err) {
-                err.message.should.equal('Model violation in the "org.accordproject.money.MonetaryAmount" instance. Invalid enum value of "true" for the field "CurrencyCode".');
+                err.message.should.equal('Model violation in the "org.accordproject.money@1.0.0.MonetaryAmount" instance. Invalid enum value of "true" for the field "CurrencyCode".');
             }
         });
 
@@ -126,7 +126,7 @@ describe('concerto-cli', () => {
                 const result = await Commands.validate(input2, offlineModels, {offline:true});
                 JSON.parse(result).should.deep.equal(JSON.parse(inputText2));
             } catch (err) {
-                err.message.should.equal('Model violation in the "org.accordproject.money.MonetaryAmount" instance. Invalid enum value of "true" for the field "CurrencyCode".');
+                err.message.should.equal('Model violation in the "org.accordproject.money@1.0.0.MonetaryAmount" instance. Invalid enum value of "true" for the field "CurrencyCode".');
             }
         });
 
@@ -158,14 +158,14 @@ describe('concerto-cli', () => {
     describe('#validate (functional)', () => {
         it('should validate against a model', async () => {
             const result = await Commands.validate(input1, models, {offline:false, functional: true});
-            (typeof result === 'undefined').should.equal(true);
+            JSON.parse(result).should.deep.equal(JSON.parse(inputText1));
         });
 
         it('should fail to validate against a model', async () => {
             try {
                 await Commands.validate(input2, models, {offline:false, functional: true});
             } catch (err) {
-                err.message.should.equal('Model violation in the "undefined" instance. Invalid enum value of "true" for the field "CurrencyCode".');
+                err.message.should.equal('Model violation in the "org.accordproject.money@1.0.0.MonetaryAmount" instance. Invalid enum value of "true" for the field "CurrencyCode".');
             }
         });
     });
@@ -283,7 +283,7 @@ describe('concerto-cli', () => {
             const dir = await tmp.dir({ unsafeCleanup: true });
             await Commands.get(models, dir.path);
             fs.readdirSync(dir.path).should.eql([
-                '@models.accordproject.org.cicero.contract.cto',
+                '@models.accordproject.org.cicero.contract@0.2.0.cto',
                 'dom.cto',
                 'money.cto'
             ]);
@@ -292,17 +292,17 @@ describe('concerto-cli', () => {
 
         it('should save external dependencies for an external model', async () => {
             const dir = await tmp.dir({ unsafeCleanup: true });
-            await Commands.get(['https://models.accordproject.org/patents/patent.cto'], dir.path);
+            await Commands.get(['https://models.accordproject.org/patents/patent@0.2.0.cto'], dir.path);
             fs.readdirSync(dir.path).should.eql([
-                '@models.accordproject.org.address.cto',
-                '@models.accordproject.org.geo.cto',
-                '@models.accordproject.org.money.cto',
-                '@models.accordproject.org.organization.cto',
-                '@models.accordproject.org.patents.patent.cto',
-                '@models.accordproject.org.person.cto',
-                '@models.accordproject.org.product.cto',
-                '@models.accordproject.org.usa.residency.cto',
-                '@models.accordproject.org.value.cto'
+                '@models.accordproject.org.address@0.2.0.cto',
+                '@models.accordproject.org.geo@0.2.0.cto',
+                '@models.accordproject.org.money@0.3.0.cto',
+                '@models.accordproject.org.organization@0.2.0.cto',
+                '@models.accordproject.org.patents.patent@0.2.0.cto',
+                '@models.accordproject.org.person@0.2.0.cto',
+                '@models.accordproject.org.product@0.2.0.cto',
+                '@models.accordproject.org.usa.residency@0.2.0.cto',
+                '@models.accordproject.org.value@0.2.0.cto'
             ]);
             dir.cleanup();
         });
@@ -658,11 +658,11 @@ describe('concerto-cli', () => {
         it('should generate an object, including metamodel', async () => {
             const obj = await Commands.generate(
                 offlineModels,
-                'org.accordproject.money.MonetaryAmount',
+                'org.accordproject.money@1.0.0.MonetaryAmount',
                 'sample',
                 { offline: true, optionalFields: true, metamodel: true }
             );
-            obj.$class.should.equal('org.accordproject.money.MonetaryAmount');
+            obj.$class.should.equal('org.accordproject.money@1.0.0.MonetaryAmount');
             (typeof obj.currencyCode).should.equal('string');
             (typeof obj.doubleValue).should.equal('number');
         });
@@ -670,11 +670,11 @@ describe('concerto-cli', () => {
         it('should generate an object', async () => {
             const obj = await Commands.generate(
                 offlineModels,
-                'org.accordproject.money.MonetaryAmount',
+                'org.accordproject.money@1.0.0.MonetaryAmount',
                 'sample',
                 { offline: true, optionalFields: true }
             );
-            obj.$class.should.equal('org.accordproject.money.MonetaryAmount');
+            obj.$class.should.equal('org.accordproject.money@1.0.0.MonetaryAmount');
             (typeof obj.currencyCode).should.equal('string');
             (typeof obj.doubleValue).should.equal('number');
         });
@@ -682,11 +682,11 @@ describe('concerto-cli', () => {
         it('should generate an identified object', async () => {
             const obj = await Commands.generate(
                 offlineModels,
-                'org.accordproject.cicero.dom.ContractTemplate',
+                'org.accordproject.cicero.dom@1.0.0.ContractTemplate',
                 'sample',
                 { offline: true, optionalFields: true }
             );
-            obj.$class.should.equal('org.accordproject.cicero.dom.ContractTemplate');
+            obj.$class.should.equal('org.accordproject.cicero.dom@1.0.0.ContractTemplate');
             Object.keys(obj).should.eql(['$class', 'metadata', 'content', 'id', '$identifier']);
         });
 
@@ -843,7 +843,7 @@ describe('concerto-cli', () => {
             const result = await Commands.extractDecorators(model, options);
             const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
             const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
-            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_2.json'),'utf-8'));
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_1.json'),'utf-8'));
             result.should.include('Extracted Decorators and models in');
             actualDecorators.should.eql(expectedDecos);
             actualVocabs.should.eql(expectedVocabs);
@@ -876,7 +876,7 @@ describe('concerto-cli', () => {
             const result = await Commands.extractDecorators(model, options);
             const actualModels = fs.readFileSync(path.resolve(dir.path, 'test.cto'),'utf-8');
             const actualVocabs = fs.readFileSync(path.resolve(dir.path, 'vocabulary_0.yml'),'utf-8');
-            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_2.json'),'utf-8'));
+            const actualDecorators = JSON.parse(fs.readFileSync(path.resolve(dir.path, 'dcs_1.json'),'utf-8'));
             result.should.include('Extracted Decorators and models');
             actualDecorators.should.eql(expectedDecos);
             actualVocabs.should.eql(expectedVocabs);
@@ -892,7 +892,7 @@ describe('concerto-cli', () => {
             const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
             await Commands.extractDecorators(model, options);
             const files = fs.readdirSync(dir.path);
-            const threeFilesExist = files.length === 6;
+            const threeFilesExist = files.length === 5;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
         });
@@ -905,7 +905,7 @@ describe('concerto-cli', () => {
             const model = [(path.resolve(__dirname, 'models', 'extract-deco-and-vocab.cto'))];
             await Commands.extractDecorators(model, options);
             const files = fs.readdirSync(dir.path + '_output');
-            const threeFilesExist = files.length === 6;
+            const threeFilesExist = files.length === 5;
             expect(threeFilesExist).to.be.true;
             dir.cleanup();
         });
