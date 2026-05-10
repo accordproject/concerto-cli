@@ -262,6 +262,27 @@ require('yargs')
                 Logger.error(err.message);
             });
     })
+    .command('validate-ast', 'validate a JSON syntax tree against the Concerto metamodel', (yargs) => {
+        yargs.demandOption(['input'], 'Please provide an input Concerto syntax tree');
+        yargs.option('input', {
+            describe: 'the metamodel to validate',
+            type: 'string'
+        });
+        yargs.option('strict', {
+            describe: 'perform strict validation',
+            type: 'boolean',
+            default: true
+        });
+    }, (argv) => {
+        try {
+            const inputString = fs.readFileSync(argv.input, 'utf8');
+            const json = JSON.parse(inputString);
+            Commands.validateAST(json);
+        } catch (err) {
+            Logger.error('Error validating AST');
+            process.exit(1);
+        }
+    })
     .command('version <release>', 'modify the version of one or more model files', yargs => {
         yargs.demandOption(['model'], 'Please provide Concerto model(s)');
         yargs.positional('release', {
