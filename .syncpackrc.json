@@ -2,6 +2,13 @@
   "$schema": "https://unpkg.com/syncpack@14/schema.json",
   "semverGroups": [
     {
+      "label": "Allow compatible Accord Project releases",
+      "dependencies": ["@accordproject/concerto-*"],
+      "dependencyTypes": ["prod", "peer"],
+      "packages": ["**"],
+      "range": "^"
+    },
+    {
       "label": "Enforce pinned versions (no ^ or ~)",
       "dependencies": ["**"],
       "dependencyTypes": ["prod", "dev", "peer"],
